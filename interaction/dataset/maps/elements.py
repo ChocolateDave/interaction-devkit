@@ -1,7 +1,7 @@
-"""Lanelet2 map element data containers.
-
-Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
-"""
+"""Lanelet2 map element data containers."""
+# Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
+# Released under the BSD-3-Clause license.
+# See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import abc
 from dataclasses import dataclass, fields
 from typing import Any, Dict, Iterable, List, Optional, Tuple
@@ -88,12 +88,12 @@ class Node(MapElement):
     def to_geometry(self) -> Point:
         return Point(self.x, self.y)
 
-    def __eq__(self, __value: object) -> bool:
+    def __eq__(self, __value: Any) -> bool:
         if isinstance(__value, Node):
             return hash(self) == hash(__value)
         return NotImplemented
 
-    def __ne__(self, __value: object) -> bool:
+    def __ne__(self, __value: Any) -> bool:
         return not self == __value
 
     def __hash__(self) -> int:
@@ -175,6 +175,10 @@ class Lanelet(MapElement):
             isinstance(id_, int) for id_ in self.succeeding_lanelets
         ), "Succeeding lanelet ids must be `int`."
 
+        self.adjacent_lanelets = tuple(self.adjacent_lanelets)
+        self.preceding_lanelets = tuple(self.preceding_lanelets)
+        self.succeeding_lanelets = tuple(self.succeeding_lanelets)
+
     def to_geometry(self) -> Polygon:
         return Polygon(
             [
@@ -206,6 +210,8 @@ class MultiPolygon(MapElement):
         assert all(
             isinstance(way, Way) for way in self.outer
         ), "MultiPolygon outer ways must be `Way` objects."
+
+        self.outer = tuple(self.outer)
 
     def to_geometry(self) -> Polygon:
         return Polygon(
@@ -256,6 +262,11 @@ class RegulatoryElement(MapElement):
             isinstance(id_, int) for id_ in self.yield_lanelets
         ), "RegulatoryElement yield_lanelets must be `int`."
 
+        self.refers = tuple(self.refers)
+        self.ref_lines = tuple(self.ref_lines)
+        self.prior_lanelets = tuple(self.prior_lanelets)
+        self.yield_lanelets = tuple(self.yield_lanelets)
+
     def to_geometry(self) -> List[LineString]:
         return [
             LineString([(node.x, node.y) for node in way.nodes])
@@ -266,7 +277,7 @@ class RegulatoryElement(MapElement):
         return hash(
             self.id,
             self.subtype,
-            self.refer,
+            self.refers,
             self.ref_lines,
             self.prior_lanelets,
             self.yield_lanelets,

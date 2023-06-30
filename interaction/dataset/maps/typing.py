@@ -7,9 +7,10 @@ vectors using the `one_hot_serialize` method:
 
     >>> from interaction_devkit.dataset.maps.typing import WayType
     >>> assert WayType.CURBSTONE_LOW.one_hot_serialize() == [1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
 """
+# Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
+# Released under the BSD-3-Clause license.
+# See https://opensource.org/license/bsd-3-clause/ for licensing details.
 from enum import IntEnum
 from typing import List
 

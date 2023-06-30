@@ -1,10 +1,10 @@
-"""Utilities for the maps dataset.
-
-Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
-"""
+"""Utilities for the maps dataset."""
+# Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
+# Released under the BSD-3-Clause license.
+# See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
-import xml
 from typing import Dict, Iterable, List, Tuple
+from xml import etree
 
 from shapely import LineString, Point
 
@@ -404,12 +404,12 @@ def get_way_type(type_str: str, subtype_str: str) -> WayType:
 
 
 def instantiate_way(
-    map_tree: xml.etree.ElementTree, element_id: int | str
+    map_tree: etree.ElementTree.ElementTree, element_id: int | str
 ) -> LineString | None:
     """Instantiates a `LineString` object from a `way` element in raw map tree.
 
     Args:
-        map_tree (xml.etree.ElementTree): the raw map tree.
+        map_tree (xml.etree.ElementTree.ElementTree): the raw map tree.
         element_id (int | str): the id of the `way` element to extract.
 
     Returns:
@@ -417,7 +417,7 @@ def instantiate_way(
         the `way` element is not visible.
     """
     projector = INTERACTIONProjector()
-    assert isinstance(map_tree, xml.etree.ElementTree)
+    assert isinstance(map_tree, etree.ElementTree.ElementTree)
     way_element = map_tree.find(f"way[@id='{element_id}']")
     if way_element.get("visible") != "true":
         # ignore non-visible way element

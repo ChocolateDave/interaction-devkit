@@ -3,12 +3,12 @@
 This module defines the API for the INTERACTION map data. The raw map data is
 stored in Lanelet2 map format `.osm` files. The map data API parses the `.osm`
 files and provides a convenient interface for accessing the map data.
-
-Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
 """
+# Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
+# Released under the BSD-3-Clause license.
+# See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
 import os
-import xml
 from collections import defaultdict
 from enum import Enum
 from itertools import chain
@@ -22,9 +22,9 @@ from typing import (
     List,
     Optional,
     Tuple,
-    TypeAlias,
     Union,
 )
+from xml import etree
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -90,8 +90,8 @@ WAY_STYLE_MAPPING: Dict[WayType, Dict[str, Any]] = {
 }
 
 # Type Aliases
-MapLayer: TypeAlias = gpd.GeoDataFrame
-PathLike: TypeAlias = Union[str, "os.PathLike[str]"]
+MapLayer = gpd.GeoDataFrame
+PathLike = Union[str, "os.PathLike[str]"]
 
 
 class INTERACTIONMapLayers(Enum):
@@ -462,7 +462,9 @@ class INTERACTIONMap:
             self._layers[layer] = initializer(map_tree)
         self._post_update_stop_lines()
 
-    def _init_node_layer(self, map_tree: xml.etree.ElementTree) -> MapLayer:
+    def _init_node_layer(
+        self, map_tree: etree.ElementTree.ElementTree
+    ) -> MapLayer:
         node_list = []
         for node in map_tree.findall("node"):
             projector = INTERACTIONProjector()
@@ -482,7 +484,9 @@ class INTERACTIONMap:
 
         return df
 
-    def _init_way_layer(self, map_tree: xml.etree.ElementTree) -> MapLayer:
+    def _init_way_layer(
+        self, map_tree: etree.ElementTree.ElementTree
+    ) -> MapLayer:
         way_list = []
         for way in map_tree.findall("way"):
             # ignore non-visible way elements
@@ -492,7 +496,7 @@ class INTERACTIONMap:
             object_id = int(way.get("id"))
             type_str = way.find("tag[@k='type']").get("v")
             subtype_str = way.find("tag[@k='subtype']")
-            if isinstance(subtype_str, xml.etree.ElementTree.Element):
+            if isinstance(subtype_str, etree.ElementTree.Element):
                 subtype_str = subtype_str.get("v")
             else:
                 subtype_str = None
@@ -516,7 +520,9 @@ class INTERACTIONMap:
 
         return df
 
-    def _init_lanelet_layer(self, map_tree: xml.etree.ElementTree) -> MapLayer:
+    def _init_lanelet_layer(
+        self, map_tree: etree.ElementTree.ElementTree
+    ) -> MapLayer:
         lanelet_list = []
         for lanelet in map_tree.findall("relation/tag[@v='lanelet']/.."):
             # ignore non-visible lanelet
@@ -526,7 +532,7 @@ class INTERACTIONMap:
 
             # parse lanelet subtype
             subtype = lanelet.find("tag[@k='subtype']")
-            if isinstance(subtype, xml.etree.ElementTree.Element):
+            if isinstance(subtype, etree.ElementTree.Element):
                 subtype = LaneletSubType[subtype.get("v").upper()]
             else:
                 subtype = LaneletSubType.UNDEFINED
@@ -648,7 +654,7 @@ class INTERACTIONMap:
         return df
 
     def _init_multipolygon_layer(
-        self, map_tree: xml.etree.ElementTree
+        self, map_tree: etree.ElementTree.ElementTree
     ) -> MapLayer:
         mp_list = []
         for mp in map_tree.findall("relation/tag[@v='multipolygon']/.."):
@@ -658,7 +664,7 @@ class INTERACTIONMap:
             object_id = int(mp.get("id"))
 
             subtype = mp.find("tag[@k='subtype']")
-            if isinstance(subtype, xml.etree.ElementTree.Element):
+            if isinstance(subtype, etree.ElementTree.Element):
                 subtype = MultiPolygonSubType[subtype.get("v").upper()]
             else:
                 subtype = MultiPolygonSubType.UNDEFINED
@@ -695,7 +701,7 @@ class INTERACTIONMap:
         return df
 
     def _init_regulatory_layer(
-        self, map_tree: xml.etree.ElementTree
+        self, map_tree: etree.ElementTree.ElementTree
     ) -> MapLayer:
         reg_list = []
         for reg in map_tree.findall(
@@ -711,7 +717,7 @@ class INTERACTIONMap:
             object_id = int(reg.get("id"))
             # parse subtype
             subtype = reg.find("tag[@k='subtype']")
-            if isinstance(subtype, xml.etree.ElementTree.Element):
+            if isinstance(subtype, etree.ElementTree.Element):
                 subtype = RegulatoryElementSubType[subtype.get("v").upper()]
             else:
                 subtype = RegulatoryElementSubType.UNDEFINED

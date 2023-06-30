@@ -1,9 +1,8 @@
-"""Coordinate projector for the raw map dataset.
-
-Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
-"""
+"""Coordinate projector for the raw map dataset."""
+# Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
+# Released under the BSD-3-Clause license.
+# See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
-from collections.abc import Iterable
 from typing import Tuple
 
 import pyproj

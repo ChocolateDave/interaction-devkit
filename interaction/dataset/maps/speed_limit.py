@@ -1,7 +1,7 @@
-"""Speed limit regulation of the lanelet.
-
-Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
-"""
+"""Speed limit regulation of the lanelet."""
+# Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
+# Released under the BSD-3-Clause license.
+# See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import re
 from typing import Any, Callable, Dict, Tuple
 
