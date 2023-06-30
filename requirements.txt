@@ -1,0 +1,12 @@
+# --------- general --------- #
+geopandas       # required for geometric dataset
+matplotlib      # required for visualization
+numpy>=1.24.1   # required for numerical comnputing
+pandas          # required for tabular data processing
+pyproj          # required for coordinate projection
+shapely>=2.0.1  # required for geometric computation
+
+# --------- others --------- #
+black           # required for code formatter
+flake8          # required for code linter
+pytest          # required for unit testing

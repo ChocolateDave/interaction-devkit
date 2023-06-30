@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "interaction-devkit"
+version = "0.1.0"
+description = "A toolkit for building interactive applications."
+readme = "README.md"
+authors = [{name="Juanwu Lu", email="juanwu@purdue.edu"}]
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+dependencies = [
+    "geopandas",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "pyproj",
+    "shapely",
+]
+
+
+[tool.black]
+line-length = 79
+
+[tool.isort]
+known_first_party = "interaction-devkit"
+
+line_length = 79
+profile = "black"
