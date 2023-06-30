@@ -1,4 +1,5 @@
 # --------- general --------- #
+defusedxml       # required for safe xml parsing
 geopandas       # required for geometric dataset
 matplotlib      # required for visualization
 numpy>=1.24.1   # required for numerical comnputing
