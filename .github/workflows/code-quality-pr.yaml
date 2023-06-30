@@ -2,7 +2,7 @@ name: Code Quality PR
 
 on:
   pull_request:
-    branches: [master, "release/*", "dev"]
+    branches: [master, "release/*", "dev", "*-dev"]
 
 jobs:
   code-quality:
