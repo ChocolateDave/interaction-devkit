@@ -2,8 +2,14 @@ from pathlib import Path
 
 import pytest
 
-from interaction.dataset.maps.elements import *
 from interaction.dataset.map_api import INTERACTIONMap, INTERACTIONMapLayers
+from interaction.dataset.maps.elements import (
+    Lanelet,
+    MultiPolygon,
+    Node,
+    RegulatoryElement,
+    Way,
+)
 
 
 @pytest.fixture(scope="module")

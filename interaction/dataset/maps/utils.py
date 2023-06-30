@@ -3,8 +3,8 @@
 Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
 """
 import math
+import xml
 from typing import Iterable, List
-from xml.etree import ElementTree as ET
 
 from shapely import LineString, Point
 
@@ -13,7 +13,7 @@ from .projector import INTERACTIONProjector
 from .typing import WayType
 
 # NOTE: the list of lanlet elements to revers only applies to version 1.1
-LANELET_TO_REVERSE: dict[str, list[int]] = {
+LANELET_TO_REVERSE: dict[str, List[int]] = {
     "DR_CHN_Merging_ZS0": [
         30014,
         30025,
@@ -404,12 +404,12 @@ def get_way_type(type_str: str, subtype_str: str) -> WayType:
 
 
 def instantiate_way(
-    map_tree: ET.ElementTree, element_id: int | str
+    map_tree: xml.etree.ElementTree, element_id: int | str
 ) -> LineString | None:
     """Instantiates a `LineString` object from a `way` element in raw map tree.
 
     Args:
-        map_tree (ElementTree): the raw map tree to extract `way` element from.
+        map_tree (xml.etree.ElementTree): the raw map tree.
         element_id (int | str): the id of the `way` element to extract.
 
     Returns:
@@ -417,16 +417,12 @@ def instantiate_way(
         the `way` element is not visible.
     """
     projector = INTERACTIONProjector()
-    assert isinstance(map_tree, ET.ElementTree), TypeError(
-        "Expect input `map_tree` to be an `ElementTree`, "
-        f"but got {map_tree.__class__.__name__:s}."
-    )
     way_element = map_tree.find(f"way[@id='{element_id}']")
     if way_element.get("visible") != "true":
         # ignore non-visible way element
         return None
 
-    coordinates: list[tuple[float, float]] = []
+    coordinates: List[tuple[float, float]] = []
     for nd_ref in way_element.findall("nd"):
         node = map_tree.find(f"node[@id='{nd_ref.get('ref')}']")
         if node.get("visible") != "true":

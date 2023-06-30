@@ -141,4 +141,3 @@ _SPEED_LIMIT_FACTORY: Dict[
     "mph": SpeedLimit.from_mph,
     "mi/h": SpeedLimit.from_mph,
 }
-"""Mapping from units to factory methods for contructing speed limits."""
