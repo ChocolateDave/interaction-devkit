@@ -802,13 +802,13 @@ class INTERACTIONMap:
                     df.loc[l_id, "stop_line"] = self._get_way(r_id)
         self._layers[INTERACTIONMapLayers.LANELET] = df
 
-    def _get_node(self, object_id: int | str) -> Node:
+    def _get_node(self, object_id: Union[int, str]) -> Node:
         df = self._layers[INTERACTIONMapLayers.NODE]
         point = df.loc[int(object_id)].geometry
         assert isinstance(point, Point)
         return Node(id=int(object_id), x=point.x, y=point.y)
 
-    def _get_way(self, object_id: int | str) -> Way:
+    def _get_way(self, object_id: Union[int, str]) -> Way:
         df = self._layers[INTERACTIONMapLayers.WAY]
         df = df.loc[int(object_id)]
         return Way(
@@ -817,7 +817,7 @@ class INTERACTIONMap:
             nodes=[self._get_node(node_id) for node_id in df["node_ids"]],
         )
 
-    def _get_lanelet(self, object_id: int | str) -> Lanelet:
+    def _get_lanelet(self, object_id: Union[int, str]) -> Lanelet:
         df = self._layers[INTERACTIONMapLayers.LANELET]
         df = df.loc[int(object_id)]
         return Lanelet(

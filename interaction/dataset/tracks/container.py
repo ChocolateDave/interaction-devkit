@@ -18,7 +18,7 @@ from itertools import chain
 from typing import Any, Iterable, Iterator, List, Optional, Tuple
 
 import numpy as np
-from shapely.geometry import LineString, Polygon, Point
+from shapely.geometry import LineString, Point, Polygon
 
 from .typing import AgentType
 
@@ -30,7 +30,7 @@ class MotionState:
     agent_id: int
     """int: The ID of the agent in a case."""
     timestamp_ms: int
-    """int: The timestamp of the motion state in miliseconds."""
+    """int: The timestamp of the motion state in milliseconds."""
     position_x: float
     """float: The x-coordinate of the position of the agent in meters."""
     position_y: float
@@ -177,7 +177,7 @@ class MotionState:
 
 @dataclass(frozen=True)
 class Track:
-    """A single track consiting of multiple motion states of the same agent."""
+    """A single track consisting of motion states of the same agent."""
 
     agent_id: int
     """int: The ID of the agent in a case."""
@@ -285,14 +285,14 @@ class INTERACTIONCase:
     def num_agents(self) -> int:
         """int: The number of agents in the case."""
         return len(
-            set(
+            {
                 track.agent_id
                 for track in chain(
                     self.history_tracks,
                     self.current_tracks,
                     self.futural_tracks,
                 )
-            )
+            }
         )
 
     def __eq__(self, __value: Any) -> bool:

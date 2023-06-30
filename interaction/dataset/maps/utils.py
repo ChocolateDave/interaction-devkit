@@ -3,7 +3,7 @@
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 from xml import etree
 
 from shapely import LineString, Point
@@ -404,17 +404,17 @@ def get_way_type(type_str: str, subtype_str: str) -> WayType:
 
 
 def instantiate_way(
-    map_tree: etree.ElementTree.ElementTree, element_id: int | str
-) -> LineString | None:
+    map_tree: etree.ElementTree.ElementTree, element_id: Union[int, str]
+) -> Optional[LineString]:
     """Instantiates a `LineString` object from a `way` element in raw map tree.
 
     Args:
         map_tree (xml.etree.ElementTree.ElementTree): the raw map tree.
-        element_id (int | str): the id of the `way` element to extract.
+        element_id (Union[int, str]): the id of the `way` element.
 
     Returns:
-        LineString | None: the instantiated `LineString` object, or `None` if
-        the `way` element is not visible.
+        Optional[LineString]: the `LineString` object instantiated from the
+        `way` element, or `None` if the `way` element is not visible.
     """
     projector = INTERACTIONProjector()
     assert isinstance(map_tree, etree.ElementTree.ElementTree)
