@@ -4,7 +4,7 @@ Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
 """
 import math
 import xml
-from typing import Iterable, List
+from typing import Dict, Iterable, List, Tuple
 
 from shapely import LineString, Point
 
@@ -13,7 +13,7 @@ from .projector import INTERACTIONProjector
 from .typing import WayType
 
 # NOTE: the list of lanlet elements to revers only applies to version 1.1
-LANELET_TO_REVERSE: dict[str, List[int]] = {
+LANELET_TO_REVERSE: Dict[str, List[int]] = {
     "DR_CHN_Merging_ZS0": [
         30014,
         30025,
@@ -362,14 +362,14 @@ LANELET_TO_REVERSE: dict[str, List[int]] = {
 }
 
 
-def get_linestring_direction(line: LineString) -> tuple[float, float]:
+def get_linestring_direction(line: LineString) -> Tuple[float, float]:
     """Computes the representative direction vector of a line :obj:`[dx, dy]`.
 
     Args:
         line (LineString): the geometric linestring to extract direction.
 
     Returns:
-        tuple[float, float]: a two-tuple direction vector `[dx, dy]`.
+        Tuple[float, float]: a two-tuple direction vector `[dx, dy]`.
     """
     assert isinstance(line, LineString), TypeError(
         f"Expect input `line` to be a `LineString`, but got {type(line)}."
@@ -417,12 +417,13 @@ def instantiate_way(
         the `way` element is not visible.
     """
     projector = INTERACTIONProjector()
+    assert isinstance(map_tree, xml.etree.ElementTree)
     way_element = map_tree.find(f"way[@id='{element_id}']")
     if way_element.get("visible") != "true":
         # ignore non-visible way element
         return None
 
-    coordinates: List[tuple[float, float]] = []
+    coordinates: List[Tuple[float, float]] = []
     for nd_ref in way_element.findall("nd"):
         node = map_tree.find(f"node[@id='{nd_ref.get('ref')}']")
         if node.get("visible") != "true":

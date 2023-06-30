@@ -4,6 +4,7 @@ Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
 """
 import math
 from collections.abc import Iterable
+from typing import Tuple
 
 import pyproj
 
@@ -37,7 +38,7 @@ class INTERACTIONProjector:
 
     def __call__(
         self, lon: float, lat: float, relative: bool = True, *args, **kwargs
-    ) -> tuple[float | Iterable[float], float | Iterable[float]]:
+    ) -> Tuple[float, float]:
         ret_x, ret_y = self._proj(lon, lat, inverse=False, *args, **kwargs)
         if relative:
             ret_x = ret_x - self._origin_x
@@ -64,8 +65,8 @@ class INTERACTIONProjector:
         self._origin_y = float(value)
 
     @property
-    def origin(self) -> tuple[float, float]:
-        """tuple[float, float]: The coordinate origin."""
+    def origin(self) -> Tuple[float, float]:
+        """Tuple[float, float]: The coordinate origin."""
         return self._origin_x, self._origin_y
 
     def __repr__(self) -> str:
