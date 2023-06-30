@@ -6,20 +6,20 @@ import abc
 from dataclasses import dataclass, fields
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from shapely.geometry.base import BaseGeometry
 from shapely.geometry import LineString, Point, Polygon
+from shapely.geometry.base import BaseGeometry
 
+from .speed_limit import SpeedLimit
 from .typing import (
     LaneletSubType,
-    WayType,
     MultiPolygonSubType,
     RegulatoryElementSubType,
+    WayType,
 )
-from .speed_limit import SpeedLimit
 
 
 @dataclass
-class MapElement(object):
+class MapElement:
     """Base class for map elements."""
 
     id: int
@@ -73,7 +73,7 @@ class MapElement(object):
 
 @dataclass
 class Node(MapElement):
-    """Data class representing a node elemenet in the map data."""
+    """Data class representing a node elemeent in the map data."""
 
     x: float
     """X coordinate of the node in meters."""
@@ -87,6 +87,14 @@ class Node(MapElement):
 
     def to_geometry(self) -> Point:
         return Point(self.x, self.y)
+
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Node):
+            return hash(self) == hash(__value)
+        return NotImplemented
+
+    def __ne__(self, __value: object) -> bool:
+        return not self == __value
 
     def __hash__(self) -> int:
         return hash((self.id, self.x, self.y))
@@ -133,12 +141,12 @@ class Lanelet(MapElement):
     """Speed limit regulation of the lanelet."""
     stop_line: Optional[Way] = None
     """Stop line of the lanelet."""
-    adjacent_lanelets: Tuple["Lanelet"] = ()
-    """Adjacent (left/right) lanelets of the current lanelet."""
-    predecessor_lanelets: Tuple["Lanelet"] = ()
-    """Predecessor (i.e., upstream inflow) lanelets of the current lanelet."""
-    successor_lanelets: Tuple["Lanelet"] = ()
-    """Successor (i.e., downstream outflow) lanelets of the current lanelet."""
+    adjacent_lanelets: Tuple[int] = ()
+    """Adjacent (left/right) lanelet ids of the current lanelet."""
+    preceding_lanelets: Tuple[int] = ()
+    """Preceding (i.e., upstream) lanelet ids of the current lanelet."""
+    succeeding_lanelets: Tuple[int] = ()
+    """Succeeding (i.e., downstream) lanelet ids of the current lanelet."""
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -158,15 +166,14 @@ class Lanelet(MapElement):
             self.stop_line, (Way, type(None))
         ), "Lanelet stop line must be a `Way` or `None`."
         assert all(
-            isinstance(lanelet, Lanelet) for lanelet in self.adjacent_lanelets
-        ), "Lanelet adjacent lanelets must be `Lanelet` objects."
+            isinstance(id_, int) for id_ in self.adjacent_lanelets
+        ), "Adjacent lanelet ids must be `int`."
         assert all(
-            isinstance(lanelet, Lanelet)
-            for lanelet in self.predecessor_lanelets
-        ), "Lanelet predecessor lanelets must be `Lanelet` objects."
+            isinstance(id_, int) for id_ in self.preceding_lanelets
+        ), "Preceding lanelet ids must be `int`."
         assert all(
-            isinstance(lanelet, Lanelet) for lanelet in self.successor_lanelets
-        ), "Lanelet successor lanelets must be `Lanelet` objects."
+            isinstance(id_, int) for id_ in self.succeeding_lanelets
+        ), "Succeeding lanelet ids must be `int`."
 
     def to_geometry(self) -> Polygon:
         return Polygon(
@@ -225,10 +232,10 @@ class RegulatoryElement(MapElement):
     """:obj:`Way` object representing the entity of the regulatory element."""
     ref_lines: Tuple[Way] = ()
     """:obj:`Way` objects representing the referencing lines."""
-    prior_lanelets: Tuple[Lanelet] = ()
-    """Lanelets that have right-of-way under the regulatory element."""
-    yield_lanelets: Tuple[Lanelet] = ()
-    """Lanelets that have to yield under the regulatory element."""
+    prior_lanelets: Tuple[int] = ()
+    """Lanelets IDs that have right-of-way under the regulatory element."""
+    yield_lanelets: Tuple[int] = ()
+    """Lanelets IDs that have to yield under the regulatory element."""
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -243,11 +250,11 @@ class RegulatoryElement(MapElement):
             isinstance(way, Way) for way in self.ref_lines
         ), "RegulatoryElement ref_lines must be `Way` objects."
         assert all(
-            isinstance(lanelet, Lanelet) for lanelet in self.prior_lanelets
-        ), "RegulatoryElement prior_lanelets must be `Lanelet` objects."
+            isinstance(id_, int) for id_ in self.prior_lanelets
+        ), "RegulatoryElement prior_lanelets must be `int`."
         assert all(
-            isinstance(lanelet, Lanelet) for lanelet in self.yield_lanelets
-        ), "RegulatoryElement yield_lanelets must be `Lanelet` objects."
+            isinstance(id_, int) for id_ in self.yield_lanelets
+        ), "RegulatoryElement yield_lanelets must be `int`."
 
     def to_geometry(self) -> List[LineString]:
         return [

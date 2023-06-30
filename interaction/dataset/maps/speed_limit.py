@@ -6,7 +6,7 @@ import re
 from typing import Any, Callable, Dict, Tuple
 
 
-class SpeedLimit(object):
+class SpeedLimit:
     """Speed limit regulation of the lanelet."""
 
     valid_units: Tuple[str] = (
@@ -141,3 +141,4 @@ _SPEED_LIMIT_FACTORY: Dict[
     "mph": SpeedLimit.from_mph,
     "mi/h": SpeedLimit.from_mph,
 }
+"""Mapping from units to factory methods for contructing speed limits."""
