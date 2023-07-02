@@ -8,7 +8,7 @@ description = "A toolkit for building interactive applications."
 readme = "README.md"
 authors = [{name="Juanwu Lu", email="juanwu@purdue.edu"}]
 license = {file = "LICENSE"}
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "defusedxml",
     "geopandas",

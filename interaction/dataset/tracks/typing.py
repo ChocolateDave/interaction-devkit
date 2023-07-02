@@ -12,7 +12,7 @@ vectors using the `one_hot_serialize` method:
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 from enum import IntEnum
-from typing import List, Union
+from typing import Union
 
 
 class AgentType(IntEnum):
