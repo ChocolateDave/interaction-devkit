@@ -13,10 +13,9 @@ dependencies = [
     "defusedxml",
     "geopandas",
     "matplotlib",
-    "numpy>=1.24.1",
     "pandas",
     "pyproj",
-    "shapely>=2.0.1",
+    "shapely>=2.0.0",
 ]
 
 [project.optional-dependencies]
