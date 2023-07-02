@@ -1,8 +1,8 @@
 """INTERACTION track data API.
 
-This module provides a set of tools for working with the INTERACTION track
-data stored in the CSV files. The track data API parses the CSV files and
-provides a convenient interface for accessing the track data.
+This module provides a set of tools for working with the INTERACTION track data
+stored in the CSV files. The track data API parses the CSV files and provides a
+convenient interface for accessing the track data.
 """
 # Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
 # Released under the BSD-3-Clause license.
@@ -19,10 +19,10 @@ import pandas as pd
 from shapely.geometry import LineString
 
 from .tracks.container import (
+    MOTION_STATE_FIELD_MAPPING,
     INTERACTIONCase,
     MotionState,
     Track,
-    MOTION_STATE_FIELD_MAPPING,
 )
 from .tracks.typing import AgentType
 

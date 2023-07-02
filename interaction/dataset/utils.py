@@ -8,7 +8,7 @@ This module provides a set of tools for working with the INTERACTION dataset:
 # Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
-from typing import List, Dict
+from typing import Dict, List
 
 LOCATIONS: List[str] = [
     "DR_CHN_Merging_ZS0",
