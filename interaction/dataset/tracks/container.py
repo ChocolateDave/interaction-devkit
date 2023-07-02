@@ -254,15 +254,23 @@ class Track:
         """int: The number of motion states in the track."""
         return len(self.motion_states)
 
-    def to_geometry(self) -> LineString:
+    def to_geometry(self) -> Union[Point, LineString]:
         """Convert the track to a Shapely geometry object.
 
         Returns:
-            LineString: The track as a Shapely geometry object.
+            Union[Point, LineString]: The track as a Shapely geometry object.
+
+        Raises:
+            ValueError: If the track has no motion states.
         """
-        return LineString(
-            [(ms.position_x, ms.position_y) for ms in self.motion_states]
-        )
+        if len(self.motion_states) == 1:
+            return self.motion_states[0].to_geometry()
+        elif len(self.motion_states) > 1:
+            return LineString(
+                [(ms.position_x, ms.position_y) for ms in self.motion_states]
+            )
+        else:
+            raise ValueError("Track must have at least one motion state.")
 
     def __eq__(self, __value: Any) -> bool:
         if isinstance(__value, Track):
@@ -344,11 +352,11 @@ class INTERACTIONCase:
         ), "Expected a non-negative integer for case ID."
 
         self.history_tracks = sorted(self.history_tracks)
-        self._history_ids = (track.agent_id for track in self.history_tracks)
+        self._history_ids = [track.agent_id for track in self.history_tracks]
         self.current_tracks = sorted(self.current_tracks)
-        self._current_ids = (track.agent_id for track in self.current_tracks)
+        self._current_ids = [track.agent_id for track in self.current_tracks]
         self.futural_tracks = sorted(self.futural_tracks)
-        self._futural_ids = (track.agent_id for track in self.futural_tracks)
+        self._futural_ids = [track.agent_id for track in self.futural_tracks]
         self.tracks_to_predict = tuple(self.tracks_to_predict)
         self.interesting_agents = tuple(self.interesting_agents)
 
@@ -458,7 +466,11 @@ class INTERACTIONCase:
                 ax=ax, color="#F29492", linewidth=1, zorder=12
             )
             gpd.GeoSeries(
-                [track.to_geometry() for track in self.futural_tracks]
+                [
+                    track.to_geometry()
+                    for track in self.futural_tracks
+                    if track.agent_id in self.tracks_to_predict
+                ]
             ).affine_transform(affine_params).plot(
                 ax=ax, color="#A8FF78", linewidth=1, zorder=13
             )

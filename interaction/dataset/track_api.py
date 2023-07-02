@@ -242,6 +242,9 @@ class INTERACTIONScenario:
             ),
         }
 
+    def __getitem__(self, case_id: int) -> INTERACTIONCase:
+        return self.get_case(case_id)
+
     def __len__(self) -> int:
         return self.num_cases
 
