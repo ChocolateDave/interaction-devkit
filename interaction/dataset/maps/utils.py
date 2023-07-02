@@ -1,10 +1,10 @@
-"""Utilities for the maps dataset.
-
-Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
-"""
+"""Utilities for the maps dataset."""
+# Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
+# Released under the BSD-3-Clause license.
+# See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
-from typing import Iterable, List
-from xml.etree import ElementTree as ET
+from typing import Dict, Iterable, List, Optional, Tuple, Union
+from xml import etree
 
 from shapely import LineString, Point
 
@@ -13,7 +13,7 @@ from .projector import INTERACTIONProjector
 from .typing import WayType
 
 # NOTE: the list of lanlet elements to revers only applies to version 1.1
-LANELET_TO_REVERSE: dict[str, list[int]] = {
+LANELET_TO_REVERSE: Dict[str, List[int]] = {
     "DR_CHN_Merging_ZS0": [
         30014,
         30025,
@@ -362,14 +362,14 @@ LANELET_TO_REVERSE: dict[str, list[int]] = {
 }
 
 
-def get_linestring_direction(line: LineString) -> tuple[float, float]:
+def get_linestring_direction(line: LineString) -> Tuple[float, float]:
     """Computes the representative direction vector of a line :obj:`[dx, dy]`.
 
     Args:
         line (LineString): the geometric linestring to extract direction.
 
     Returns:
-        tuple[float, float]: a two-tuple direction vector `[dx, dy]`.
+        Tuple[float, float]: a two-tuple direction vector `[dx, dy]`.
     """
     assert isinstance(line, LineString), TypeError(
         f"Expect input `line` to be a `LineString`, but got {type(line)}."
@@ -404,29 +404,26 @@ def get_way_type(type_str: str, subtype_str: str) -> WayType:
 
 
 def instantiate_way(
-    map_tree: ET.ElementTree, element_id: int | str
-) -> LineString | None:
+    map_tree: etree.ElementTree.ElementTree, element_id: Union[int, str]
+) -> Optional[LineString]:
     """Instantiates a `LineString` object from a `way` element in raw map tree.
 
     Args:
-        map_tree (ElementTree): the raw map tree to extract `way` element from.
-        element_id (int | str): the id of the `way` element to extract.
+        map_tree (xml.etree.ElementTree.ElementTree): the raw map tree.
+        element_id (Union[int, str]): the id of the `way` element.
 
     Returns:
-        LineString | None: the instantiated `LineString` object, or `None` if
-        the `way` element is not visible.
+        Optional[LineString]: the `LineString` object instantiated from the
+        `way` element, or `None` if the `way` element is not visible.
     """
     projector = INTERACTIONProjector()
-    assert isinstance(map_tree, ET.ElementTree), TypeError(
-        "Expect input `map_tree` to be an `ElementTree`, "
-        f"but got {map_tree.__class__.__name__:s}."
-    )
+    assert isinstance(map_tree, etree.ElementTree.ElementTree)
     way_element = map_tree.find(f"way[@id='{element_id}']")
     if way_element.get("visible") != "true":
         # ignore non-visible way element
         return None
 
-    coordinates: list[tuple[float, float]] = []
+    coordinates: List[Tuple[float, float]] = []
     for nd_ref in way_element.findall("nd"):
         node = map_tree.find(f"node[@id='{nd_ref.get('ref')}']")
         if node.get("visible") != "true":

@@ -2,8 +2,14 @@ from pathlib import Path
 
 import pytest
 
-from interaction.dataset.maps.elements import *
 from interaction.dataset.map_api import INTERACTIONMap, INTERACTIONMapLayers
+from interaction.dataset.maps.elements import (
+    Lanelet,
+    MultiPolygon,
+    Node,
+    RegulatoryElement,
+    Way,
+)
 
 
 @pytest.fixture(scope="module")
@@ -34,7 +40,7 @@ def test_map_api_properties(test_create_map_api: INTERACTIONMap):
         abs=1e-2,
     )
     assert test_create_map_api.map_root == str(
-        Path(__file__).parents[3].joinpath(Path("data/maps"))
+        Path(__file__).parents[3].joinpath(Path("data/maps")).resolve()
     )
     assert test_create_map_api.location == "DR_USA_Roundabout_FT"
 

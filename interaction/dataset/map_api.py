@@ -3,9 +3,10 @@
 This module defines the API for the INTERACTION map data. The raw map data is
 stored in Lanelet2 map format `.osm` files. The map data API parses the `.osm`
 files and provides a convenient interface for accessing the map data.
-
-Copyright (c) 2023, Juanwu Lu. Released under the BSD-3-Clause license.
 """
+# Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
+# Released under the BSD-3-Clause license.
+# See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
 import os
 from collections import defaultdict
@@ -21,10 +22,9 @@ from typing import (
     List,
     Optional,
     Tuple,
-    TypeAlias,
     Union,
 )
-from xml.etree import ElementTree as ET
+from xml import etree
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -33,7 +33,6 @@ from shapely.geometry import (
     LineString,
     MultiLineString,
     MultiPoint,
-    MultiPolygon,
     Point,
     Polygon,
 )
@@ -82,7 +81,7 @@ WAY_STYLE_MAPPING: Dict[WayType, Dict[str, Any]] = {
         color="#FFFFFF", linewidth=1.5, zorder=3
     ),
     WayType.STOP_LINE: dict(color="#FFFFFF", linewidth=1.5, zorder=3),
-    WayType.PEDESTRIAN_MARKING: dict(color="#A0C544", linewidth=1.5, zorder=4),
+    WayType.PEDESTRIAN_MARKING: dict(color="#FFFFFF", linewidth=1.5, zorder=4),
     WayType.VIRTUAL: dict(
         color="#FFFFFF", linewidth=0.25, dashes=[2, 10], zorder=3
     ),
@@ -91,8 +90,8 @@ WAY_STYLE_MAPPING: Dict[WayType, Dict[str, Any]] = {
 }
 
 # Type Aliases
-MapLayer: TypeAlias = gpd.GeoDataFrame
-PathLike: TypeAlias = Union[str, "os.PathLike[str]"]
+MapLayer = gpd.GeoDataFrame
+PathLike = Union[str, "os.PathLike[str]"]
 
 
 class INTERACTIONMapLayers(Enum):
@@ -157,7 +156,7 @@ class INTERACTIONMap:
             AssertionError: if the map data files are invalid.
         """
         self._layers: Dict[str, MapLayer] = defaultdict(MapLayer)
-        self._root = root
+        self._root = Path(root).resolve()
         self._location = location
         self._init_layers()
 
@@ -377,7 +376,7 @@ class INTERACTIONMap:
         radius: Optional[float] = None,
         ax: Optional[plt.Axes] = None,
     ) -> plt.Axes:
-        """Render the map into a matplotlib axes or a numpy array.
+        """Render the base map.
 
         Args:
             anchor (Optional[Tuple[float, float, float]], optional): the
@@ -433,7 +432,7 @@ class INTERACTIONMap:
                 geometry.plot(
                     ax=ax,
                     ec="#FFFFFF",
-                    fc="#A3B86C",
+                    fc="#737373",
                     lw=0.0,
                     alpha=0.75,
                     zorder=2,
@@ -463,7 +462,9 @@ class INTERACTIONMap:
             self._layers[layer] = initializer(map_tree)
         self._post_update_stop_lines()
 
-    def _init_node_layer(self, map_tree: ET) -> MapLayer:
+    def _init_node_layer(
+        self, map_tree: etree.ElementTree.ElementTree
+    ) -> MapLayer:
         node_list = []
         for node in map_tree.findall("node"):
             projector = INTERACTIONProjector()
@@ -483,7 +484,9 @@ class INTERACTIONMap:
 
         return df
 
-    def _init_way_layer(self, map_tree: ET.ElementTree) -> MapLayer:
+    def _init_way_layer(
+        self, map_tree: etree.ElementTree.ElementTree
+    ) -> MapLayer:
         way_list = []
         for way in map_tree.findall("way"):
             # ignore non-visible way elements
@@ -493,7 +496,7 @@ class INTERACTIONMap:
             object_id = int(way.get("id"))
             type_str = way.find("tag[@k='type']").get("v")
             subtype_str = way.find("tag[@k='subtype']")
-            if isinstance(subtype_str, ET.Element):
+            if isinstance(subtype_str, etree.ElementTree.Element):
                 subtype_str = subtype_str.get("v")
             else:
                 subtype_str = None
@@ -517,7 +520,9 @@ class INTERACTIONMap:
 
         return df
 
-    def _init_lanelet_layer(self, map_tree: ET.ElementTree) -> MapLayer:
+    def _init_lanelet_layer(
+        self, map_tree: etree.ElementTree.ElementTree
+    ) -> MapLayer:
         lanelet_list = []
         for lanelet in map_tree.findall("relation/tag[@v='lanelet']/.."):
             # ignore non-visible lanelet
@@ -527,7 +532,7 @@ class INTERACTIONMap:
 
             # parse lanelet subtype
             subtype = lanelet.find("tag[@k='subtype']")
-            if isinstance(subtype, ET.Element):
+            if isinstance(subtype, etree.ElementTree.Element):
                 subtype = LaneletSubType[subtype.get("v").upper()]
             else:
                 subtype = LaneletSubType.UNDEFINED
@@ -648,7 +653,9 @@ class INTERACTIONMap:
 
         return df
 
-    def _init_multipolygon_layer(self, map_tree: ET.ElementTree) -> MapLayer:
+    def _init_multipolygon_layer(
+        self, map_tree: etree.ElementTree.ElementTree
+    ) -> MapLayer:
         mp_list = []
         for mp in map_tree.findall("relation/tag[@v='multipolygon']/.."):
             # ignore non-visible multipolygon elements
@@ -657,7 +664,7 @@ class INTERACTIONMap:
             object_id = int(mp.get("id"))
 
             subtype = mp.find("tag[@k='subtype']")
-            if isinstance(subtype, ET.Element):
+            if isinstance(subtype, etree.ElementTree.Element):
                 subtype = MultiPolygonSubType[subtype.get("v").upper()]
             else:
                 subtype = MultiPolygonSubType.UNDEFINED
@@ -693,7 +700,9 @@ class INTERACTIONMap:
 
         return df
 
-    def _init_regulatory_layer(self, map_tree: ET.ElementTree) -> MapLayer:
+    def _init_regulatory_layer(
+        self, map_tree: etree.ElementTree.ElementTree
+    ) -> MapLayer:
         reg_list = []
         for reg in map_tree.findall(
             "relation/tag[@v='regulatory_element']/.."
@@ -708,7 +717,7 @@ class INTERACTIONMap:
             object_id = int(reg.get("id"))
             # parse subtype
             subtype = reg.find("tag[@k='subtype']")
-            if isinstance(subtype, ET.Element):
+            if isinstance(subtype, etree.ElementTree.Element):
                 subtype = RegulatoryElementSubType[subtype.get("v").upper()]
             else:
                 subtype = RegulatoryElementSubType.UNDEFINED
@@ -793,13 +802,13 @@ class INTERACTIONMap:
                     df.loc[l_id, "stop_line"] = self._get_way(r_id)
         self._layers[INTERACTIONMapLayers.LANELET] = df
 
-    def _get_node(self, object_id: int | str) -> Node:
+    def _get_node(self, object_id: Union[int, str]) -> Node:
         df = self._layers[INTERACTIONMapLayers.NODE]
         point = df.loc[int(object_id)].geometry
         assert isinstance(point, Point)
         return Node(id=int(object_id), x=point.x, y=point.y)
 
-    def _get_way(self, object_id: int | str) -> Way:
+    def _get_way(self, object_id: Union[int, str]) -> Way:
         df = self._layers[INTERACTIONMapLayers.WAY]
         df = df.loc[int(object_id)]
         return Way(
@@ -808,7 +817,7 @@ class INTERACTIONMap:
             nodes=[self._get_node(node_id) for node_id in df["node_ids"]],
         )
 
-    def _get_lanelet(self, object_id: int | str) -> Lanelet:
+    def _get_lanelet(self, object_id: Union[int, str]) -> Lanelet:
         df = self._layers[INTERACTIONMapLayers.LANELET]
         df = df.loc[int(object_id)]
         return Lanelet(
