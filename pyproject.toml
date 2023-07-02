@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 
 [project]
 name = "interaction-devkit"
-version = "0.1.1"
+version = "0.1.2"
 description = "A toolkit for building interactive applications."
 readme = "README.md"
 authors = [{name="Juanwu Lu", email="juanwu@purdue.edu"}]
@@ -32,7 +32,7 @@ line_length = 79
 profile = "black"
 
 [tool.bumpver]
-current_version = "0.1.1"
+current_version = "0.1.2"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "Bump version {old_version} -> {new_version}"
 commit = true
