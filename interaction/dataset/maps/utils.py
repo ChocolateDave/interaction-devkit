@@ -3,7 +3,8 @@
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from collections.abc import Iterable
+from typing import Optional, Union
 from xml import etree
 
 from shapely import LineString, Point
@@ -13,7 +14,7 @@ from .projector import INTERACTIONProjector
 from .typing import WayType
 
 # NOTE: the list of lanlet elements to revers only applies to version 1.1
-LANELET_TO_REVERSE: Dict[str, List[int]] = {
+LANELET_TO_REVERSE: dict[str, list[int]] = {
     "DR_CHN_Merging_ZS0": [
         30014,
         30025,
@@ -362,7 +363,7 @@ LANELET_TO_REVERSE: Dict[str, List[int]] = {
 }
 
 
-def get_linestring_direction(line: LineString) -> Tuple[float, float]:
+def get_linestring_direction(line: LineString) -> tuple[float, float]:
     """Computes the representative direction vector of a line :obj:`[dx, dy]`.
 
     Args:
@@ -423,7 +424,7 @@ def instantiate_way(
         # ignore non-visible way element
         return None
 
-    coordinates: List[Tuple[float, float]] = []
+    coordinates: list[tuple[float, float]] = []
     for nd_ref in way_element.findall("nd"):
         node = map_tree.find(f"node[@id='{nd_ref.get('ref')}']")
         if node.get("visible") != "true":
@@ -441,7 +442,7 @@ def instantiate_way(
     return LineString(coordinates=coordinates)
 
 
-def order_ways(ways: Iterable[Way]) -> List[Way]:
+def order_ways(ways: Iterable[Way]) -> list[Way]:
     """Orders an iterable of `Way` elements to form a continuous path.
 
     Args:
@@ -454,7 +455,7 @@ def order_ways(ways: Iterable[Way]) -> List[Way]:
         return []
 
     # start with the first way element
-    ordered_ways: List[Way] = [ways.pop(0)]
+    ordered_ways: list[Way] = [ways.pop(0)]
 
     # while there are still way element left
     while ways:

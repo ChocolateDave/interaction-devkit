@@ -3,7 +3,6 @@
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
-from typing import Tuple
 
 import pyproj
 
@@ -37,7 +36,7 @@ class INTERACTIONProjector:
 
     def __call__(
         self, lon: float, lat: float, relative: bool = True, *args, **kwargs
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         ret_x, ret_y = self._proj(lon, lat, inverse=False, *args, **kwargs)
         if relative:
             ret_x = ret_x - self._origin_x
@@ -64,7 +63,7 @@ class INTERACTIONProjector:
         self._origin_y = float(value)
 
     @property
-    def origin(self) -> Tuple[float, float]:
+    def origin(self) -> tuple[float, float]:
         """Tuple[float, float]: The coordinate origin."""
         return self._origin_x, self._origin_y
 

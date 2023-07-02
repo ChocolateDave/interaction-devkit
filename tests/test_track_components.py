@@ -3,8 +3,12 @@ from copy import deepcopy
 
 import pytest
 
-from ..tracks.container import INTERACTIONCase, MotionState, Track
-from ..tracks.typing import AgentType
+from interaction.dataset.tracks.container import (
+    INTERACTIONCase,
+    MotionState,
+    Track,
+)
+from interaction.dataset.tracks.typing import AgentType
 
 
 # ----------- Test typing ----------- #

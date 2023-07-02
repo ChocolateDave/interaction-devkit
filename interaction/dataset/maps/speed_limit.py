@@ -3,13 +3,13 @@
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import re
-from typing import Any, Callable, Dict, Tuple
+from typing import Any, Callable
 
 
 class SpeedLimit:
     """Speed limit regulation of the lanelet."""
 
-    valid_units: Tuple[str] = (
+    valid_units: tuple[str] = (
         "mps",
         "kmph",
         "kmh",
@@ -124,7 +124,7 @@ class SpeedLimit:
         return str(self)
 
 
-_SPEED_LIMIT_FACTORY: Dict[
+_SPEED_LIMIT_FACTORY: dict[
     str,
     Callable[
         [
