@@ -8,9 +8,7 @@ This module provides a set of tools for working with the INTERACTION dataset:
 # Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
-from typing import Dict, List
-
-LOCATIONS: List[str] = [
+LOCATIONS: list[str] = [
     "DR_CHN_Merging_ZS0",
     "DR_CHN_Merging_ZS2",
     "DR_CHN_Roundabout_LN",
@@ -31,7 +29,7 @@ LOCATIONS: List[str] = [
     "DR_USA_Roundabout_SR",
 ]
 
-SPLITS: Dict[str, List[str]] = {
+SPLITS: dict[str, list[str]] = {
     "train": [
         "DR_CHN_Merging_ZS0",
         "DR_CHN_Merging_ZS2",

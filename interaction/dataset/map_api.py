@@ -10,20 +10,11 @@ files and provides a convenient interface for accessing the map data.
 import math
 import os
 from collections import defaultdict
+from collections.abc import Generator, Iterable
 from enum import Enum
 from itertools import chain
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generator,
-    Iterable,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Optional, Union
 from xml import etree
 
 import geopandas as gpd
@@ -64,7 +55,7 @@ from .maps.utils import (
 )
 
 # Constants
-WAY_STYLE_MAPPING: Dict[WayType, Dict[str, Any]] = {
+WAY_STYLE_MAPPING: dict[WayType, dict[str, Any]] = {
     WayType.UNDEFINED: dict(alpha=0.0),
     WayType.CURBSTONE_LOW: dict(color="#919595", linewidth=1.5, zorder=3),
     WayType.GUARD_RAIL: dict(color="#919595", linewidth=1.5, zorder=3),
@@ -155,7 +146,7 @@ class INTERACTIONMap:
         Raises:
             AssertionError: if the map data files are invalid.
         """
-        self._layers: Dict[str, MapLayer] = defaultdict(MapLayer)
+        self._layers: dict[str, MapLayer] = defaultdict(MapLayer)
         self._root = Path(root).resolve()
         self._location = location
         self._init_layers()
@@ -171,7 +162,7 @@ class INTERACTIONMap:
             len(self._layers[INTERACTIONMapLayers.LANELET]) > 0
         ), AssertionError("Empty map lanelet layer.")
 
-        self._object_getters: Dict[
+        self._object_getters: dict[
             INTERACTIONMapLayers,
             Callable[
                 [
@@ -188,7 +179,7 @@ class INTERACTIONMap:
         }
 
     @property
-    def bounds(self) -> Tuple[float, float, float, float]:
+    def bounds(self) -> tuple[float, float, float, float]:
         """Tuple[float, float, float, float]: bounding as
         :obj:`(minx, miny, maxx, maxy)`."""
         _nodes = self._layers[INTERACTIONMapLayers.NODE].geometry
@@ -207,7 +198,7 @@ class INTERACTIONMap:
         """str: the root directory of map data files."""
         return str(self._root)
 
-    def get_available_layers(self) -> Dict[INTERACTIONMapLayers, int]:
+    def get_available_layers(self) -> dict[INTERACTIONMapLayers, int]:
         """Returns a Dict mapping each map layer to its number of objects.
 
         Returns:
@@ -253,7 +244,7 @@ class INTERACTIONMap:
 
     def get_all_proximal_layers(
         self, loc: Iterable[float], radius: Optional[float] = None
-    ) -> Generator[Tuple[INTERACTIONMapLayers, MapLayer], None, None]:
+    ) -> Generator[tuple[INTERACTIONMapLayers, MapLayer], None, None]:
         """Returns all the map layers within a query range.
 
         Args:
@@ -275,7 +266,7 @@ class INTERACTIONMap:
 
     def get_all_proximal_map_objects(
         self, loc: Iterable[float], radius: Optional[float] = None
-    ) -> Generator[Tuple[INTERACTIONMapLayers, List[MapElement]], None, None]:
+    ) -> Generator[tuple[INTERACTIONMapLayers, list[MapElement]], None, None]:
         """Returns all the map objects within a query range.
 
         Args:
@@ -298,9 +289,9 @@ class INTERACTIONMap:
     def get_proximal_map_layers(
         self,
         loc: Iterable[float],
-        layers: List[Union[str, INTERACTIONMapLayers]],
+        layers: list[Union[str, INTERACTIONMapLayers]],
         radius: Optional[float] = None,
-    ) -> Generator[Tuple[INTERACTIONMapLayers, MapLayer], None, None]:
+    ) -> Generator[tuple[INTERACTIONMapLayers, MapLayer], None, None]:
         """Yields the map layer dataframe clipped into the query range.
 
         Args:
@@ -333,9 +324,9 @@ class INTERACTIONMap:
     def get_proximal_map_objects_of_layers(
         self,
         loc: Iterable[float],
-        layers: List[Union[INTERACTIONMapLayers, str]],
+        layers: list[Union[INTERACTIONMapLayers, str]],
         radius: Optional[float] = None,
-    ) -> Generator[Tuple[INTERACTIONMapLayers, List[MapElement]], None, None]:
+    ) -> Generator[tuple[INTERACTIONMapLayers, list[MapElement]], None, None]:
         """Yields the map objects within a query range in given map layers.
 
         Args:
@@ -372,7 +363,7 @@ class INTERACTIONMap:
 
     def render(
         self,
-        anchor: Optional[Tuple[float, float, float]] = None,
+        anchor: Optional[tuple[float, float, float]] = None,
         radius: Optional[float] = None,
         ax: Optional[plt.Axes] = None,
     ) -> plt.Axes:
@@ -614,7 +605,7 @@ class INTERACTIONMap:
         df.set_index("object_id", inplace=True)
 
         # create lanelet connectivity
-        def _get_heads_and_tails(row: gpd.GeoSeries) -> Tuple[Point, ...]:
+        def _get_heads_and_tails(row: gpd.GeoSeries) -> tuple[Point, ...]:
             left_head = Point(row["left_boundary"].to_geometry().coords[0])
             left_tail = Point(row["left_boundary"].to_geometry().coords[-1])
             right_head = Point(row["right_boundary"].to_geometry().coords[0])
@@ -669,8 +660,8 @@ class INTERACTIONMap:
             else:
                 subtype = MultiPolygonSubType.UNDEFINED
 
-            outer_way_ids: List[str] = []
-            outer_ways: List[Way] = []
+            outer_way_ids: list[str] = []
+            outer_ways: list[Way] = []
             for way in mp.findall("member[@role='outer']"):
                 outer_way_ids.append(way.get("ref"))
                 outer_ways.append(self._get_way(int(way.get("ref"))))
@@ -729,9 +720,9 @@ class INTERACTIONMap:
             for yield_lane in reg.findall("member[@role='yield']"):
                 yield_lane_ids.append(int(yield_lane.get("ref")))
 
-            refer_ids: List[int] = []
-            refers: List[LineString] = []
-            ref_line_ids: List[int] = []
+            refer_ids: list[int] = []
+            refers: list[LineString] = []
+            ref_line_ids: list[int] = []
             for refer in reg.findall("member[@role='refers']"):
                 # validate refer line type
                 refer_id = int(refer.get("ref"))

@@ -10,10 +10,11 @@ This module provides the following containers:
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain
-from typing import Any, Iterable, Iterator, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -207,7 +208,7 @@ class Track:
     """int: The ID of the agent in a case."""
     type: AgentType
     """AgentType: The type of the agent."""
-    motion_states: Tuple[MotionState, ...] = ()
+    motion_states: tuple[MotionState, ...] = ()
     """Tuple[MotionState, ...]: The motion states of the agent."""
 
     def __post_init__(self) -> None:
@@ -229,12 +230,12 @@ class Track:
         )
 
     @cached_property
-    def bounding_boxes(self) -> List[Polygon]:
+    def bounding_boxes(self) -> list[Polygon]:
         """List[Polygon]: The bounding boxes of the track."""
         return [ms.bounding_box for ms in self.motion_states]
 
     @cached_property
-    def timestamps(self) -> List[int]:
+    def timestamps(self) -> list[int]:
         """List[int]: The timestamps of the track in milliseconds."""
         return [ms.timestamp_ms for ms in self.motion_states]
 
@@ -324,15 +325,15 @@ class INTERACTIONCase:
     """str: The location name of the case."""
     case_id: int
     """int: The ID of the case."""
-    history_tracks: Tuple[Track] = ()
+    history_tracks: tuple[Track] = ()
     """Tuple[Track, ...]: The history tracks of the case."""
-    current_tracks: Tuple[Track] = ()
+    current_tracks: tuple[Track] = ()
     """Tuple[Track, ...]: The current tracks of the case."""
-    futural_tracks: Tuple[Track] = ()
+    futural_tracks: tuple[Track] = ()
     """Tuple[Track, ...]: The futural tracks of the case."""
-    tracks_to_predict: Tuple[int] = ()
+    tracks_to_predict: tuple[int] = ()
     """Tuple[int, ...]: The IDs of the tracks to predict."""
-    interesting_agents: Tuple[int] = ()
+    interesting_agents: tuple[int] = ()
     """Tuple[int, ...]: The IDs of the interesting agents (ego vehicles)."""
 
     def __post_init__(self) -> None:
@@ -395,10 +396,10 @@ class INTERACTIONCase:
 
     def render(
         self,
-        anchor: Optional[Tuple[float, float, float]] = None,
+        anchor: Optional[tuple[float, float, float]] = None,
         ax: Optional[plt.Axes] = None,
         mode: str = "tail-box",
-    ) -> Union[plt.Axes, List[plt.Axes]]:
+    ) -> Union[plt.Axes, list[plt.Axes]]:
         """Render the case.
 
         Args:

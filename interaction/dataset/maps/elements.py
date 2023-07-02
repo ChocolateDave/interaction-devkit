@@ -3,8 +3,9 @@
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import abc
+from collections.abc import Iterable
 from dataclasses import dataclass, fields
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Optional
 
 from shapely.geometry import LineString, Point, Polygon
 from shapely.geometry.base import BaseGeometry
@@ -33,9 +34,9 @@ class MapElement:
         ), f"Map element ID must be a non-negative int, but got {self.id}"
 
     @classmethod
-    def deserialize(cls, data: Dict[str, Any]) -> "MapElement":
+    def deserialize(cls, data: dict[str, Any]) -> "MapElement":
         """Deserialize a map element from a dictionary."""
-        attrs: Dict[str, Any] = {}
+        attrs: dict[str, Any] = {}
         for field_ in fields(cls):
             assert field_.name in data, f"Missing field {field_.name}"
             attrs[field_.name] = data[field_.name]
@@ -43,11 +44,11 @@ class MapElement:
         return cls(**data)
 
     @property
-    def field_names(self) -> List[str]:
+    def field_names(self) -> list[str]:
         """Return the field names of the map element."""
         return [field_.name for field_ in fields(self)]
 
-    def serialize(self) -> Dict[str, Any]:
+    def serialize(self) -> dict[str, Any]:
         """Serialize a map element to a dictionary."""
         return {
             field_.name: getattr(self, field_.name) for field_ in fields(self)
@@ -106,7 +107,7 @@ class Way(MapElement):
 
     type: WayType
     """Type of the way."""
-    nodes: Tuple[Node]
+    nodes: tuple[Node]
     """Tuple of :obj:`Node` objects that make up the way."""
 
     def __post_init__(self) -> None:
@@ -119,7 +120,7 @@ class Way(MapElement):
         return LineString([(node.x, node.y) for node in self.nodes])
 
     @property
-    def node_ids(self) -> Tuple[int]:
+    def node_ids(self) -> tuple[int]:
         """The IDs of the nodes that make up the way."""
         return tuple(node.id for node in self.nodes)
 
@@ -141,11 +142,11 @@ class Lanelet(MapElement):
     """Speed limit regulation of the lanelet."""
     stop_line: Optional[Way] = None
     """Stop line of the lanelet."""
-    adjacent_lanelets: Tuple[int] = ()
+    adjacent_lanelets: tuple[int] = ()
     """Adjacent (left/right) lanelet ids of the current lanelet."""
-    preceding_lanelets: Tuple[int] = ()
+    preceding_lanelets: tuple[int] = ()
     """Preceding (i.e., upstream) lanelet ids of the current lanelet."""
-    succeeding_lanelets: Tuple[int] = ()
+    succeeding_lanelets: tuple[int] = ()
     """Succeeding (i.e., downstream) lanelet ids of the current lanelet."""
 
     def __post_init__(self) -> None:
@@ -199,7 +200,7 @@ class MultiPolygon(MapElement):
 
     subtype: MultiPolygonSubType
     """Subtype of the multipolygon."""
-    outer: Tuple[Way]
+    outer: tuple[Way]
     """A tuple of ways that make up the outer boundary of the multipolygon."""
 
     def __post_init__(self) -> None:
@@ -234,13 +235,13 @@ class RegulatoryElement(MapElement):
 
     subtype: RegulatoryElementSubType
     """Subtype of the regulatory element."""
-    refers: Tuple[Way] = ()
+    refers: tuple[Way] = ()
     """:obj:`Way` object representing the entity of the regulatory element."""
-    ref_lines: Tuple[Way] = ()
+    ref_lines: tuple[Way] = ()
     """:obj:`Way` objects representing the referencing lines."""
-    prior_lanelets: Tuple[int] = ()
+    prior_lanelets: tuple[int] = ()
     """Lanelets IDs that have right-of-way under the regulatory element."""
-    yield_lanelets: Tuple[int] = ()
+    yield_lanelets: tuple[int] = ()
     """Lanelets IDs that have to yield under the regulatory element."""
 
     def __post_init__(self) -> None:
@@ -267,7 +268,7 @@ class RegulatoryElement(MapElement):
         self.prior_lanelets = tuple(self.prior_lanelets)
         self.yield_lanelets = tuple(self.yield_lanelets)
 
-    def to_geometry(self) -> List[LineString]:
+    def to_geometry(self) -> list[LineString]:
         return [
             LineString([(node.x, node.y) for node in way.nodes])
             for way in self.refers

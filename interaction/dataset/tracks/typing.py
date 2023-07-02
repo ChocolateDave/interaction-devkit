@@ -45,7 +45,7 @@ class AgentType(IntEnum):
         else:
             raise TypeError(f"Unable to deserialize {value} to AgentType.")
 
-    def one_hot_serialize(self) -> List[int]:
+    def one_hot_serialize(self) -> list[int]:
         ret = [0 for _ in range(max(AgentType))]
         if self.value > 0:
             ret[self.value - 1] = 1
