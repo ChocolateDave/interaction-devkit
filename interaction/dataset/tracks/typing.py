@@ -12,7 +12,7 @@ vectors using the `one_hot_serialize` method:
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 from enum import IntEnum
-from typing import List
+from typing import List, Union
 
 
 class AgentType(IntEnum):
@@ -24,6 +24,26 @@ class AgentType(IntEnum):
     """The observed `agent` is a car."""
     PEDESTRIAN_BICYCLE = 2
     """The observed `agent` is a pedestrian or a bicycle."""
+
+    @classmethod
+    def deserialize(cls, value: Union[int, str]) -> "AgentType":
+        """Deserialize an `AgentType` from a string.
+
+        Args:
+            value (Union[int, str]): the value to deserialize.
+
+        Returns:
+            AgentType: the deserialized `AgentType` value.
+
+        Raises:
+            TypeError: if the value cannot be deserialized.
+        """
+        if isinstance(value, str):
+            return cls[value.strip().replace("/", "_").upper()]
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            raise TypeError(f"Unable to deserialize {value} to AgentType.")
 
     def one_hot_serialize(self) -> List[int]:
         ret = [0 for _ in range(max(AgentType))]

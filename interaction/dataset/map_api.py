@@ -81,7 +81,7 @@ WAY_STYLE_MAPPING: Dict[WayType, Dict[str, Any]] = {
         color="#FFFFFF", linewidth=1.5, zorder=3
     ),
     WayType.STOP_LINE: dict(color="#FFFFFF", linewidth=1.5, zorder=3),
-    WayType.PEDESTRIAN_MARKING: dict(color="#A0C544", linewidth=1.5, zorder=4),
+    WayType.PEDESTRIAN_MARKING: dict(color="#FFFFFF", linewidth=1.5, zorder=4),
     WayType.VIRTUAL: dict(
         color="#FFFFFF", linewidth=0.25, dashes=[2, 10], zorder=3
     ),
@@ -156,7 +156,7 @@ class INTERACTIONMap:
             AssertionError: if the map data files are invalid.
         """
         self._layers: Dict[str, MapLayer] = defaultdict(MapLayer)
-        self._root = root
+        self._root = Path(root).resolve()
         self._location = location
         self._init_layers()
 
@@ -376,7 +376,7 @@ class INTERACTIONMap:
         radius: Optional[float] = None,
         ax: Optional[plt.Axes] = None,
     ) -> plt.Axes:
-        """Render the map into a matplotlib axes or a numpy array.
+        """Render the base map.
 
         Args:
             anchor (Optional[Tuple[float, float, float]], optional): the
@@ -432,7 +432,7 @@ class INTERACTIONMap:
                 geometry.plot(
                     ax=ax,
                     ec="#FFFFFF",
-                    fc="#A3B86C",
+                    fc="#737373",
                     lw=0.0,
                     alpha=0.75,
                     zorder=2,
