@@ -10,7 +10,7 @@ convenient interface for accessing the track data.
 from collections import defaultdict
 from enum import IntEnum
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -21,11 +21,9 @@ from .tracks.container import (
     INTERACTIONCase,
     MotionState,
     Track,
+    TrackFrame,
 )
 from .tracks.typing import AgentType
-
-# type aliases
-TrackFrame = Union[gpd.GeoDataFrame, pd.DataFrame]
 
 
 class INTERACTIONScenarioLayers(IntEnum):
@@ -107,17 +105,23 @@ class INTERACTIONScenario:
 
         return str(Path(self._root).joinpath(filename))
 
-    def get_case(self, case_id: int) -> INTERACTIONCase:
-        history_tracks = self.get_tracks_from_frame(self._get_history(case_id))
-        current_tracks = self.get_tracks_from_frame(self._get_current(case_id))
-        futural_tracks = self.get_tracks_from_frame(self._get_futural(case_id))
+    @property
+    def tracks_to_predict(self) -> dict[int, list[int]]:
+        """dict[int, list[int]]: the tracks to predict for each case."""
+        return self._tracks_to_predict
 
+    @property
+    def interesting_agents(self) -> dict[int, list[int]]:
+        """dict[int, list[int]]: the interesting agents for each case."""
+        return self._interesting_agents
+
+    def get_case(self, case_id: int) -> INTERACTIONCase:
         return INTERACTIONCase(
             location=self._location,
             case_id=int(case_id),
-            history_tracks=history_tracks,
-            current_tracks=current_tracks,
-            futural_tracks=futural_tracks,
+            history_frame=self._get_history(int(case_id)),
+            current_frame=self._get_current(int(case_id)),
+            futural_frame=self._get_futural(int(case_id)),
             tracks_to_predict=self._tracks_to_predict[int(case_id)],
             interesting_agents=self._interesting_agents[int(case_id)],
         )
@@ -135,25 +139,6 @@ class INTERACTIONScenario:
             )
 
         return self.get_case(case_id).render(anchor=anchor, ax=ax, mode=mode)
-
-    @staticmethod
-    def get_tracks_from_frame(frame: TrackFrame) -> list[Track]:
-        track_dict = defaultdict(list)
-        track_type = {}
-        for track_id, row in frame.iterrows():
-            motion_state = MotionState(
-                agent_id=int(track_id),
-                **row.rename(index=MOTION_STATE_FIELD_MAPPING)[
-                    list(MOTION_STATE_FIELD_MAPPING.values())
-                ],
-            )
-            track_dict[track_id].append(motion_state)
-            track_type[track_id] = AgentType.deserialize(row["agent_type"])
-
-        return [
-            Track(agent_id=key, type=track_type[key], motion_states=value)
-            for key, value in track_dict.items()
-        ]
 
     def _get_history(self, case_id: int) -> TrackFrame:
         df = self._frames[INTERACTIONScenarioLayers.MOTION_STATE].loc[case_id]
