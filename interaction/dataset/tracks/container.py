@@ -364,7 +364,7 @@ class INTERACTIONCase:
             by=["track_id", "timestamp_ms"], inplace=True
         )
         self.futural_frame.sort_values(
-            by=["agent_id", "timestamp_ms"], inplace=True
+            by=["track_id", "timestamp_ms"], inplace=True
         )
 
     @cached_property
