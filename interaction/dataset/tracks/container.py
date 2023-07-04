@@ -11,12 +11,11 @@ This module provides the following containers:
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
 import math
 from collections import defaultdict
-from collections.abc import Iterable, Iterator
+from collections.abc import Generator, Iterable, Iterator
 from dataclasses import dataclass
 from functools import cached_property
 from itertools import chain
 from typing import Any, Optional, Union
-from collections.abc import Generator
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -369,7 +368,7 @@ class INTERACTIONCase:
 
     @cached_property
     def history_ids(self) -> list[int]:
-        return self.history_frame["track_id"].unique().tolist()
+        return self.history_frame.index.unique().tolist()
 
     @cached_property
     def history_tracks(self) -> list[Track]:
@@ -377,7 +376,7 @@ class INTERACTIONCase:
 
     @cached_property
     def current_ids(self) -> list[int]:
-        return self.current_frame["track_id"].unique().tolist()
+        return self.current_frame.index.unique().tolist()
 
     @cached_property
     def current_tracks(self) -> list[Track]:
@@ -385,7 +384,7 @@ class INTERACTIONCase:
 
     @cached_property
     def futural_ids(self) -> list[int]:
-        return self.futural_frame["track_id"].unique().tolist()
+        return self.futural_frame.index.unique().tolist()
 
     @cached_property
     def futural_tracks(self) -> list[Track]:
@@ -395,14 +394,9 @@ class INTERACTIONCase:
     def num_agents(self) -> int:
         """int: The number of agents in the case."""
         return len(
-            {
-                track.agent_id
-                for track in chain(
-                    self.history_tracks,
-                    self.current_tracks,
-                    self.futural_tracks,
-                )
-            }
+            set(self.history_frame.index.tolist())
+            .union(set(self.current_frame.index.tolist()))
+            .union(set(self.futural_frame.index.tolist()))
         )
 
     def get_history_track(self, agent_id: int) -> Optional[Track]:
@@ -469,8 +463,8 @@ class INTERACTIONCase:
             ), "Invalid anchor point: must be a 2D pose with [x, y, heading]."
             x, y, heading = anchor
             cosine, sine = math.cos(heading), math.sin(heading)
-            xoff, yoff = -x * cosine + y * sine, -x * sine - y * cosine
-            affine_params = [cosine, -sine, sine, cosine, xoff, yoff]
+            xoff, yoff = cosine * x + sine * y, -sine * x + cosine * y
+            affine_params = [cosine, sine, -sine, cosine, -xoff, -yoff]
         else:
             affine_params = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
 
@@ -536,8 +530,33 @@ class INTERACTIONCase:
                 )
             return ax
         elif mode == "full-box":
-            # TODO: render the full tracks as boxes
-            raise NotImplementedError
+            for track in self.get_history_tracks():
+                color = (
+                    "#F29492"
+                    if track.agent_id in self.tracks_to_predict
+                    else "#00CFFD"
+                )
+                for motion_state in track.motion_states:
+                    alpha = 0.5 + 1 / (
+                        1 + math.exp(0.5 * (1000 - motion_state.timestamp_ms))
+                    )
+                    gpd.GeoSeries(motion_state.bounding_box).affine_transform(
+                        affine_params
+                    ).plot(
+                        ax=ax,
+                        ec="#000000",
+                        fc=color,
+                        lw=1.0,
+                        alpha=alpha,
+                        zorder=11,
+                    )
+            for track in self.get_futural_tracks():
+                if track.agent_id not in self.tracks_to_predict:
+                    continue
+                gpd.GeoSeries(track.bounding_boxes).affine_transform(
+                    affine_params
+                ).plot(ax=ax, ec="#000000", fc="#A8FF78", lw=1.0, zorder=13)
+            return ax
         elif mode == "animation":
             # TODO: implement the animation mode
             raise NotImplementedError
@@ -623,7 +642,7 @@ class INTERACTIONCase:
         )
 
     def __str__(self) -> str:
-        attr_str = ", ".join([f"{k}={v}" for k, v in self.__dict__.items()])
+        attr_str = f"case_id={self.case_id}, location={self.location}"
         return f"<{self.__class__.__name__}({attr_str}) at {hex(id(self))}>"
 
     def __repr__(self) -> str:
