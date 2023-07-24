@@ -6,7 +6,7 @@
 #
 attrs==23.1.0
     # via fiona
-certifi==2023.5.7
+certifi==2023.7.22
     # via
     #   fiona
     #   pyproj
