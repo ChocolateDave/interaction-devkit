@@ -27,7 +27,7 @@ defusedxml==0.7.1
     # via interaction-devkit (pyproject.toml)
 fiona==1.9.4.post1
     # via geopandas
-fonttools==4.40.0
+fonttools==4.41.1
     # via matplotlib
 geopandas==0.13.2
     # via interaction-devkit (pyproject.toml)
