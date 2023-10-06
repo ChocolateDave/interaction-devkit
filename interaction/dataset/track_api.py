@@ -180,7 +180,7 @@ class INTERACTIONScenario:
         # extract tracks to predict and interesting agents
         if self._split == "test":
             tracks_to_predict = motion_state_df.loc[
-                motion_state_df["tracks_to_predict"] == 1
+                motion_state_df["track_to_predict"] == 1
             ]
             self._tracks_to_predict: dict[int, list[int]] = (
                 tracks_to_predict.groupby("case_id")
