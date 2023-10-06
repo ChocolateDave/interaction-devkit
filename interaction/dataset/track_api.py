@@ -128,13 +128,16 @@ class INTERACTIONScenario:
         anchor: Optional[tuple[float, float, float]] = None,
         ax: Optional[plt.Axes] = None,
         mode: str = "tail-box",
+        plot_future: bool = False,
     ) -> plt.Axes:
         if case_id >= self._num_cases:
             raise ValueError(
                 f"Invalid case_id {case_id} for scenario {self._location}."
             )
 
-        return self.get_case(case_id).render(anchor=anchor, ax=ax, mode=mode)
+        return self.get_case(case_id).render(
+            anchor=anchor, ax=ax, mode=mode, plot_future=plot_future
+        )
 
     @staticmethod
     def get_tracks_from_frame(frame: TrackFrame) -> list[Track]:
@@ -183,7 +186,6 @@ class INTERACTIONScenario:
                 tracks_to_predict.groupby("case_id")
                 .agg(track_id=("track_id", lambda x: x.unique().tolist()))
                 .to_dict()["track_id"]
-                .to_dict()
             )
             interesting_agents = motion_state_df.loc[
                 motion_state_df["interesting_agent"] == 1
@@ -192,7 +194,6 @@ class INTERACTIONScenario:
                 interesting_agents.groupby("case_id")
                 .agg(track_id=("track_id", lambda x: x.unique().tolist()))
                 .to_dict()["track_id"]
-                .to_dict()
             )
         else:
             tracks_to_predict = motion_state_df.groupby(
@@ -212,6 +213,7 @@ class INTERACTIONScenario:
                 .agg(list)["track_id"]
                 .to_dict()
             )
+        if len(self._interesting_agents) == 0:
             self._interesting_agents: dict[int, list[int]] = {
                 case_id: [] for case_id in motion_state_df.case_id.unique()
             }

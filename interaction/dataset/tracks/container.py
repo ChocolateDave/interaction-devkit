@@ -399,6 +399,7 @@ class INTERACTIONCase:
         anchor: Optional[tuple[float, float, float]] = None,
         ax: Optional[plt.Axes] = None,
         mode: str = "tail-box",
+        plot_future: bool = True,
     ) -> Union[plt.Axes, list[plt.Axes]]:
         """Render the case.
 
@@ -411,6 +412,8 @@ class INTERACTIONCase:
             mode (str): The mode to render the case, and it must be one of
             `["tail-box", "full-line", "full-box", "animation"]`. Defaults to
             `"tail-box"`.
+            plot_future (bool): Whether to plot the future tracks.
+            Defaults to `True`.
 
         Returns:
             plt.Axes: The axes to render the case.
@@ -457,11 +460,14 @@ class INTERACTIONCase:
             ).affine_transform(affine_params).plot(
                 ax=ax, color="#F29492", linewidth=1, zorder=12
             )
-            gpd.GeoSeries(
-                [track.to_geometry() for track in self.futural_tracks]
-            ).affine_transform(affine_params).plot(
-                ax=ax, color="#A8FF78", linewidth=1, zorder=13
-            )
+
+            if plot_future:
+                gpd.GeoSeries(
+                    [track.to_geometry() for track in self.futural_tracks]
+                ).affine_transform(affine_params).plot(
+                    ax=ax, color="#A8FF78", linewidth=1, zorder=13
+                )
+
             if mode == "tail-box":
                 gpd.GeoSeries(
                     [
