@@ -433,8 +433,8 @@ class INTERACTIONCase:
             ), "Invalid anchor point: must be a 2D pose with [x, y, heading]."
             x, y, heading = anchor
             cosine, sine = math.cos(heading), math.sin(heading)
-            xoff, yoff = -x * cosine + y * sine, -x * sine - y * cosine
-            affine_params = [cosine, -sine, sine, cosine, xoff, yoff]
+            xoff, yoff = -x * cosine - y * sine, x * sine - y * cosine
+            affine_params = [cosine, sine, -sine, cosine, xoff, yoff]
         else:
             affine_params = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
 

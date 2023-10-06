@@ -390,9 +390,9 @@ class INTERACTIONMap:
                 len(anchor) == 3
             ), "Invalid anchor point: must be a 2D pose with [x, y, heading]."
             x, y, heading = anchor
-            cos, sin = math.cos(heading), math.sin(heading)
-            xoff, yoff = -x * cos + y * sin, -x * sin - y * cos
-            affine_params = [cos, -sin, sin, cos, xoff, yoff]
+            cosine, sine = math.cos(heading), math.sin(heading)
+            xoff, yoff = -x * cosine + y * sine, x * sine - y * cosine
+            affine_params = [cosine, sine, -sine, cosine, xoff, yoff]
         else:
             affine_params = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
 
