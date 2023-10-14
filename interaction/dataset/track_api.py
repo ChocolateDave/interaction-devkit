@@ -188,8 +188,6 @@ class INTERACTIONScenario:
                 .agg(list)["track_id"]
                 .to_dict()
             )
-
-        if len(self._interesting_agents) == 0:
             self._interesting_agents: dict[int, list[int]] = {
                 case_id: [] for case_id in motion_state_df.case_id.unique()
             }
