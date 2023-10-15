@@ -170,6 +170,10 @@ class INTERACTIONScenario:
                 .agg(track_id=("track_id", lambda x: x.unique().tolist()))
                 .to_dict()["track_id"]
             )
+            if len(self._interesting_agents) == 0:
+                self._interesting_agents = {
+                    case_id: [] for case_id in motion_state_df.case_id.unique()
+                }
         else:
             tracks_to_predict = motion_state_df.groupby(
                 ["case_id", "track_id"]
