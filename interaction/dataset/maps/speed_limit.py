@@ -2,14 +2,16 @@
 # Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
+from __future__ import annotations
+
 import re
-from typing import Any, Callable
+from typing import Any, Callable, Dict, Tuple
 
 
 class SpeedLimit:
     """Speed limit regulation of the lanelet."""
 
-    valid_units: tuple[str] = (
+    valid_units: Tuple[str] = (
         "mps",
         "kmph",
         "kmh",
@@ -124,7 +126,7 @@ class SpeedLimit:
         return str(self)
 
 
-_SPEED_LIMIT_FACTORY: dict[
+_SPEED_LIMIT_FACTORY: Dict[
     str,
     Callable[
         [

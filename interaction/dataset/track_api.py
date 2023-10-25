@@ -7,9 +7,11 @@ convenient interface for accessing the track data.
 # Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
+from __future__ import annotations
+
 from enum import IntEnum
 from pathlib import Path
-from typing import Optional
+from typing import Dict, List, Optional, Tuple
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -99,13 +101,13 @@ class INTERACTIONScenario:
         return str(Path(self._root).joinpath(filename))
 
     @property
-    def tracks_to_predict(self) -> dict[int, list[int]]:
-        """dict[int, list[int]]: the tracks to predict for each case."""
+    def tracks_to_predict(self) -> Dict[int, List[int]]:
+        """Dict[int, List[int]]: the tracks to predict for each case."""
         return self._tracks_to_predict
 
     @property
-    def interesting_agents(self) -> dict[int, list[int]]:
-        """dict[int, list[int]]: the interesting agents for each case."""
+    def interesting_agents(self) -> Dict[int, List[int]]:
+        """Dict[int, List[int]]: the interesting agents for each case."""
         return self._interesting_agents
 
     def get_case(self, case_id: int) -> INTERACTIONCase:
@@ -122,7 +124,7 @@ class INTERACTIONScenario:
     def render(
         self,
         case_id: int,
-        anchor: Optional[tuple[float, float, float]] = None,
+        anchor: Optional[Tuple[float, float, float]] = None,
         ax: Optional[plt.Axes] = None,
         mode: str = "tail-box",
     ) -> plt.Axes:
@@ -157,7 +159,7 @@ class INTERACTIONScenario:
             tracks_to_predict = motion_state_df.loc[
                 motion_state_df["track_to_predict"] == 1
             ]
-            self._tracks_to_predict: dict[int, list[int]] = (
+            self._tracks_to_predict: Dict[int, List[int]] = (
                 tracks_to_predict.groupby("case_id")
                 .agg(track_id=("track_id", lambda x: x.unique().tolist()))
                 .to_dict()["track_id"]
@@ -165,7 +167,7 @@ class INTERACTIONScenario:
             interesting_agents = motion_state_df.loc[
                 motion_state_df["interesting_agent"] == 1
             ]
-            self._interesting_agents: dict[int, list[int]] = (
+            self._interesting_agents: Dict[int, List[int]] = (
                 interesting_agents.groupby("case_id")
                 .agg(track_id=("track_id", lambda x: x.unique().tolist()))
                 .to_dict()["track_id"]
@@ -187,12 +189,12 @@ class INTERACTIONScenario:
                 & (tracks_to_predict["max_timestamp"] == 4000)
                 & (tracks_to_predict["agent_type"] == AgentType.CAR.value)
             ].reset_index(drop=False)
-            self._tracks_to_predict: dict[int, list[int]] = (
+            self._tracks_to_predict: Dict[int, List[int]] = (
                 tracks_to_predict.groupby("case_id")
                 .agg(list)["track_id"]
                 .to_dict()
             )
-            self._interesting_agents: dict[int, list[int]] = {
+            self._interesting_agents: Dict[int, List[int]] = {
                 case_id: [] for case_id in motion_state_df.case_id.unique()
             }
 

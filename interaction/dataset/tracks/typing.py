@@ -11,8 +11,10 @@ vectors using the `one_hot_serialize` method:
 # Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
+from __future__ import annotations
+
 from enum import IntEnum
-from typing import Union
+from typing import List, Union
 
 
 class AgentType(IntEnum):
@@ -45,7 +47,7 @@ class AgentType(IntEnum):
         else:
             raise TypeError(f"Unable to deserialize {value} to AgentType.")
 
-    def one_hot_serialize(self) -> list[int]:
+    def one_hot_serialize(self) -> List[int]:
         ret = [0 for _ in range(max(AgentType))]
         if self.value > 0:
             ret[self.value - 1] = 1

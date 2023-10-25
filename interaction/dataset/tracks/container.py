@@ -9,12 +9,14 @@ This module provides the following containers:
 # Copyright (c) 2023, Juanwu Lu <juanwu@purdue.edu>.
 # Released under the BSD-3-Clause license.
 # See https://opensource.org/license/bsd-3-clause/ for licensing details.
+from __future__ import annotations
+
 import math
 from collections import defaultdict
 from collections.abc import Generator, Iterable, Iterator
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Any, Optional, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -212,7 +214,7 @@ class Track:
     """int: The ID of the agent in a case."""
     type: AgentType
     """AgentType: The type of the agent."""
-    motion_states: tuple[MotionState, ...] = ()
+    motion_states: Tuple[MotionState, ...] = ()
     """Tuple[MotionState, ...]: The motion states of the agent."""
 
     def __post_init__(self) -> None:
@@ -234,12 +236,12 @@ class Track:
         )
 
     @cached_property
-    def bounding_boxes(self) -> list[Polygon]:
+    def bounding_boxes(self) -> List[Polygon]:
         """List[Polygon]: The bounding boxes of the track."""
         return [ms.bounding_box for ms in self.motion_states]
 
     @cached_property
-    def timestamps(self) -> list[int]:
+    def timestamps(self) -> List[int]:
         """List[int]: The timestamps of the track in milliseconds."""
         return [ms.timestamp_ms for ms in self.motion_states]
 
@@ -343,9 +345,9 @@ class INTERACTIONCase:
     """TrackFrame: The current frame of the case."""
     futural_frame: TrackFrame
     """TrackFrame: The futural frame of the case."""
-    tracks_to_predict: list[int]
+    tracks_to_predict: List[int]
     """List[int]: The IDs of the tracks to predict."""
-    interesting_agents: list[int]
+    interesting_agents: List[int]
     """List[int]: The IDs of the interesting agents in the case."""
 
     def __post_init__(self) -> None:
@@ -366,27 +368,27 @@ class INTERACTIONCase:
         )
 
     @cached_property
-    def history_ids(self) -> list[int]:
+    def history_ids(self) -> List[int]:
         return self.history_frame.index.unique().tolist()
 
     @cached_property
-    def history_tracks(self) -> list[Track]:
+    def history_tracks(self) -> List[Track]:
         return self.get_tracks_from_frame(self.history_frame)
 
     @cached_property
-    def current_ids(self) -> list[int]:
+    def current_ids(self) -> List[int]:
         return self.current_frame.index.unique().tolist()
 
     @cached_property
-    def current_tracks(self) -> list[Track]:
+    def current_tracks(self) -> List[Track]:
         return self.get_tracks_from_frame(self.current_frame)
 
     @cached_property
-    def futural_ids(self) -> list[int]:
+    def futural_ids(self) -> List[int]:
         return self.futural_frame.index.unique().tolist()
 
     @cached_property
-    def futural_tracks(self) -> list[Track]:
+    def futural_tracks(self) -> List[Track]:
         return self.get_tracks_from_frame(self.futural_frame)
 
     @cached_property
@@ -428,11 +430,11 @@ class INTERACTIONCase:
 
     def render(
         self,
-        anchor: Optional[tuple[float, float, float]] = None,
+        anchor: Optional[Tuple[float, float, float]] = None,
         ax: Optional[plt.Axes] = None,
         mode: str = "tail-box",
         plot_future: bool = True,
-    ) -> Union[plt.Axes, list[plt.Axes]]:
+    ) -> Union[plt.Axes, List[plt.Axes]]:
         """Render the case.
 
         Args:
@@ -566,7 +568,7 @@ class INTERACTIONCase:
             raise NotImplementedError
 
     @staticmethod
-    def get_tracks_from_frame(frame: TrackFrame) -> list[Track]:
+    def get_tracks_from_frame(frame: TrackFrame) -> List[Track]:
         track_dict = defaultdict(list)
         track_type = {}
         for track_id, row in frame.iterrows():
